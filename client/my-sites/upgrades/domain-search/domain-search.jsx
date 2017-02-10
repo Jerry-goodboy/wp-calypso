@@ -20,6 +20,7 @@ var observe = require( 'lib/mixins/data-observe' ),
 	cartItems = require( 'lib/cart-values/cart-items' ),
 	analyticsMixin = require( 'lib/mixins/analytics' );
 import { currentUserHasFlag } from 'state/current-user/selectors';
+import { isSiteUpgradeable } from 'state/sites/selectors';
 
 var DomainSearch = React.createClass( {
 	mixins: [ observe( 'productsList', 'sites' ), analyticsMixin( 'registerDomain' ) ],
@@ -60,7 +61,7 @@ var DomainSearch = React.createClass( {
 	checkSiteIsUpgradeable: function() {
 		var selectedSite = this.props.sites.getSelectedSite();
 
-		if ( selectedSite && ! selectedSite.isUpgradeable() ) {
+		if ( selectedSite && ! this.props.isSiteUpgradeable ) {
 			page.redirect( '/domains/add' );
 		}
 	},
@@ -155,7 +156,12 @@ var DomainSearch = React.createClass( {
 } );
 
 module.exports = connect(
-	( state ) => ( {
-		domainsWithPlansOnly: currentUserHasFlag( state, DOMAINS_WITH_PLANS_ONLY )
-	} )
+	( state, props ) => {
+		const selectedSite = props.sites.getSelectedSite();
+
+		return {
+			domainsWithPlansOnly: currentUserHasFlag( state, DOMAINS_WITH_PLANS_ONLY ),
+			isSiteUpgradeable: isSiteUpgradeable( state, selectedSite && selectedSite.ID )
+		};
+	}
 )( DomainSearch );

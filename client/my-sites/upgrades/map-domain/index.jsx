@@ -1,26 +1,29 @@
 /**
  * External dependencies
  */
-var page = require( 'page' ),
-	React = require( 'react' ),
-	omit = require( 'lodash/omit' ),
-	{ connect } = require( 'react-redux' );
+import page from 'page';
+import React from 'react';
+import omit from 'lodash/omit';
+import { connect } from 'react-redux';
 
 /**
  * Internal dependencies
  */
-var HeaderCake = require( 'components/header-cake' ),
-	MapDomainStep = require( 'components/domains/map-domain-step' ),
-	{ DOMAINS_WITH_PLANS_ONLY } = require( 'state/current-user/constants' ),
-	cartItems = require( 'lib/cart-values' ).cartItems,
-	upgradesActions = require( 'lib/upgrades/actions' ),
-	observe = require( 'lib/mixins/data-observe' ),
-	wpcom = require( 'lib/wp' ).undocumented(),
-	paths = require( 'my-sites/upgrades/paths' );
+import HeaderCake from 'components/header-cake';
+import MapDomainStep from 'components/domains/map-domain-step';
+import { DOMAINS_WITH_PLANS_ONLY } from 'state/current-user/constants';
+import { cartItems } from 'lib/cart-values';
+import upgradesActions from 'lib/upgrades/actions';
+import observe from 'lib/mixins/data-observe';
+import wp from 'lib/wp';
+import paths from 'my-sites/upgrades/paths';
 import { currentUserHasFlag } from 'state/current-user/selectors';
+import { isSiteUpgradeable } from 'state/sites/selectors';
 import Notice from 'components/notice';
 
-var MapDomain = React.createClass( {
+const wpcom = wp.undocumented();
+
+const MapDomain = React.createClass( {
 	mixins: [ observe( 'productsList', 'sites' ) ],
 
 	propTypes: {
@@ -58,7 +61,7 @@ var MapDomain = React.createClass( {
 
 		const selectedSite = this.props.sites.getSelectedSite();
 
-		if ( selectedSite && ! selectedSite.isUpgradeable() ) {
+		if ( selectedSite && ! this.props.isSiteUpgradeable ) {
 			page.redirect( '/domains/add/mapping' );
 		}
 	},
@@ -141,8 +144,13 @@ var MapDomain = React.createClass( {
 	}
 } );
 
-module.exports = connect( state => (
-	{
-		domainsWithPlansOnly: currentUserHasFlag( state, DOMAINS_WITH_PLANS_ONLY )
+export default connect(
+	( state, ownProps ) => {
+		const selectedSite = ownProps.sites.getSelectedSite();
+
+		return {
+			domainsWithPlansOnly: currentUserHasFlag( state, DOMAINS_WITH_PLANS_ONLY ),
+			isSiteUpgradeable: isSiteUpgradeable( state, selectedSite && selectedSite.ID )
+		};
 	}
-) )( MapDomain );
+)( MapDomain );

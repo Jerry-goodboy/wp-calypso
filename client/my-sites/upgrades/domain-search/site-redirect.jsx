@@ -2,17 +2,19 @@
  * External dependencies
  */
 var page = require( 'page' ),
-	React = require( 'react' );
+	React = require( 'react' ),
+	{ connect } = require( 'react-redux' );
 
 /**
  * Internal dependencies
  */
-var HeaderCake = require( 'components/header-cake' ),
-	Main = require( 'components/main' ),
-	SiteRedirectStep = require( './site-redirect-step' ),
-	observe = require( 'lib/mixins/data-observe' );
+import HeaderCake from 'components/header-cake';
+import Main from 'components/main';
+import SiteRedirectStep from './site-redirect-step';
+import observe from 'lib/mixins/data-observe';
+import { isSiteUpgradeable } from 'state/sites/selectors';
 
-var SiteRedirect = React.createClass( {
+const SiteRedirect = React.createClass( {
 	mixins: [ observe( 'productsList', 'sites' ) ],
 
 	propTypes: {
@@ -35,7 +37,7 @@ var SiteRedirect = React.createClass( {
 	checkSiteIsUpgradeable: function( ) {
 		var selectedSite = this.props.sites.getSelectedSite();
 
-		if ( selectedSite && ! selectedSite.isUpgradeable() ) {
+		if ( selectedSite && ! this.props.isSiteUpgradeable ) {
 			page.redirect( '/domains/add' );
 		}
 	},
@@ -60,4 +62,12 @@ var SiteRedirect = React.createClass( {
 	}
 } );
 
-module.exports = SiteRedirect;
+export default connect(
+	( state, ownProps ) => {
+		const selectedSite = ownProps.sites.getSelectedSite();
+
+		return {
+			isSiteUpgradeable: isSiteUpgradeable( state, selectedSite && selectedSite.ID )
+		};
+	}
+)( SiteRedirect );

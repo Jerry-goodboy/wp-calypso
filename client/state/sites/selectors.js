@@ -27,6 +27,8 @@ import { isHttps, withoutHttp, addQueryArgs, urlToSlug } from 'lib/url';
 /**
  * Internal dependencies
  */
+import { canCurrentUser } from 'state/selectors';
+import { getCurrentUserId } from 'state/current-user/selectors';
 import createSelector from 'lib/create-selector';
 import { fromApi as seoTitleFromApi } from 'components/seo/meta-title-editor/mappings';
 import versionCompare from 'lib/version-compare';
@@ -278,6 +280,24 @@ export function isSitePreviewable( state, siteId ) {
 
 	const unmappedUrl = getSiteOption( state, siteId, 'unmapped_url' );
 	return !! unmappedUrl && isHttps( unmappedUrl );
+}
+
+/**
+ * Returns true if the site can be upgraded by the user, false if the
+ * site cannot be upgraded, or null if upgrade ability cannot be
+ * determined.
+ *
+ * @param  {Object}   state  Global state tree
+ * @param  {Number}   siteId Site ID
+ * @return {?Boolean}        Whether site is upgradeable
+ */
+export function isSiteUpgradeable( state, siteId ) {
+	// Cannot determine site upgradeability if there is no current user
+	if ( ! getCurrentUserId( state ) || ! getRawSite( state, siteId ) ) {
+		return null;
+	}
+
+	return canCurrentUser( state, siteId, 'manage_options' );
 }
 
 /**
