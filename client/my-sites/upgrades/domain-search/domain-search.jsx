@@ -3,8 +3,9 @@
  */
 import { connect } from 'react-redux';
 import page from 'page';
-import React from 'react';
+import React, { Component } from 'react';
 import classnames from 'classnames';
+import { localize } from 'i18n-calypso';
 
 /**
  * Internal dependencies
@@ -23,39 +24,43 @@ import { isSiteUpgradeable } from 'state/sites/selectors';
 import { getSelectedSite, getSelectedSiteId } from 'state/ui/selectors';
 import QueryProductsList from 'components/data/query-products-list';
 
-const DomainSearch = React.createClass( {
-	mixins: [ analyticsMixin( 'registerDomain' ) ],
+const analytics = analyticsMixin( 'registerDomain' );
 
-	propTypes: {
+class DomainSearch extends Component {
+	static propTypes = {
 		selectedSite: React.PropTypes.object.isRequired,
 		sitePlans: React.PropTypes.object.isRequired,
 		productsList: React.PropTypes.object.isRequired,
 		basePath: React.PropTypes.string.isRequired,
 		context: React.PropTypes.object.isRequired,
 		domainsWithPlansOnly: React.PropTypes.bool.isRequired
-	},
+	};
 
-	getInitialState() {
-		return { domainRegistrationAvailable: true };
-	},
+	constructor() {
+		super();
+		this.handleDomainsAvailabilityChange = this.handleDomainsAvailabilityChange.bind( this );
+		this.handleAddRemoveDomain = this.handleAddRemoveDomain.bind( this );
+		this.handleAddMapping = this.handleAddMapping.bind( this );
+		this.state = { domainRegistrationAvailable: true };
+	}
 
 	componentDidMount() {
 		this.checkSiteIsUpgradeable();
-	},
+	}
 
 	componentWillReceiveProps() {
 		this.checkSiteIsUpgradeable();
-	},
+	}
 
 	checkSiteIsUpgradeable() {
 		if ( this.props.selectedSite && ! this.props.isSiteUpgradeable ) {
 			page.redirect( '/domains/add' );
 		}
-	},
+	}
 
 	handleDomainsAvailabilityChange( isAvailable ) {
 		this.setState( { domainRegistrationAvailable: isAvailable } );
-	},
+	}
 
 	handleAddRemoveDomain( suggestion ) {
 		if ( ! cartItems.hasDomainInCart( this.props.cart, suggestion.domain_name ) ) {
@@ -63,15 +68,15 @@ const DomainSearch = React.createClass( {
 		} else {
 			this.removeDomain( suggestion );
 		}
-	},
+	}
 
 	handleAddMapping( domain ) {
 		upgradesActions.addItem( cartItems.domainMapping( { domain } ) );
 		page( '/checkout/' + this.props.selectedSite.slug );
-	},
+	}
 
 	addDomain( suggestion ) {
-		this.recordEvent( 'addDomainButtonClick', suggestion.domain_name, 'domains' );
+		analytics.recordEvent( 'addDomainButtonClick', suggestion.domain_name, 'domains' );
 		const items = [
 			cartItems.domainRegistration( { domain: suggestion.domain_name, productSlug: suggestion.product_slug } )
 		];
@@ -84,28 +89,27 @@ const DomainSearch = React.createClass( {
 
 		upgradesActions.addItems( items );
 		upgradesActions.goToDomainCheckout( suggestion );
-	},
+	}
 
 	removeDomain( suggestion ) {
-		this.recordEvent( 'removeDomainButtonClick', suggestion.domain_name );
+		analytics.recordEvent( 'removeDomainButtonClick', suggestion.domain_name );
 		upgradesActions.removeDomainFromCart( suggestion );
-	},
+	}
 
 	render() {
-		var { selectedSite } = this.props,
+		const { selectedSite, translate } = this.props,
 			classes = classnames( 'main-column', {
 				'domain-search-page-wrapper': this.state.domainRegistrationAvailable
-			} ),
-			content;
-
+			} );
+		let content;
 
 		if ( ! this.state.domainRegistrationAvailable ) {
 			content = (
 				<EmptyContent
 					illustration="/calypso/images/drake/drake-500.svg"
-					title={ this.translate( 'Domain registration is unavailable' ) }
-					line={ this.translate( "We're hard at work on the issue. Please check back shortly." ) }
-					action={ this.translate( 'Back to Plans' ) }
+					title={ translate( 'Domain registration is unavailable' ) }
+					line={ translate( "We're hard at work on the issue. Please check back shortly." ) }
+					action={ translate( 'Back to Plans' ) }
 					actionURL={ '/plans/' + selectedSite.slug } />
 			);
 		} else {
@@ -142,7 +146,7 @@ const DomainSearch = React.createClass( {
 			</Main>
 		);
 	}
-} );
+}
 
 export default connect(
 	( state ) => ( {
@@ -151,4 +155,4 @@ export default connect(
 		isSiteUpgradeable: isSiteUpgradeable( state, getSelectedSiteId( state ) ),
 		productsList: state.productsList.items,
 	} )
-)( DomainSearch );
+)( localize( DomainSearch ) );
