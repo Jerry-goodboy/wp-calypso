@@ -89,9 +89,7 @@ module.exports = {
 		renderWithReduxStore(
 			(
 				<CartData>
-					<SiteRedirect
-						productsList={ productsList }
-						sites={ sites } />
+					<SiteRedirect />
 				</CartData>
 			),
 			document.getElementById( 'primary' ),
