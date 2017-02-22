@@ -26,10 +26,15 @@ const wpcom = wp.undocumented();
 
 class MapDomain extends Component {
 	static propTypes = {
+		initialQuery: React.PropTypes.string,
 		query: React.PropTypes.string,
+		path: React.PropTypes.string.isRequired,
+		cart: React.PropTypes.object.isRequired,
+		selectedSite: React.PropTypes.object,
+		domainsWithPlansOnly: React.PropTypes.bool.isRequired,
 		isSiteUpgradeable: React.PropTypes.bool,
 		productsList: React.PropTypes.object.isRequired,
-		domainsWithPlansOnly: React.PropTypes.bool.isRequired
+		translate: React.PropTypes.func.isRequired,
 	};
 
 	constructor() {

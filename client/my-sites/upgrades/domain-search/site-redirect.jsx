@@ -18,9 +18,11 @@ import QueryProductsList from 'components/data/query-products-list';
 
 class SiteRedirect extends Component {
 	static propTypes = {
+		cart: React.PropTypes.object.isRequired,
+		selectedSite: React.PropTypes.object,
 		isSiteUpgradeable: React.PropTypes.bool,
 		productsList: React.PropTypes.object.isRequired,
-		sites: React.PropTypes.object.isRequired,
+		translate: React.PropTypes.func.isRequired,
 	};
 
 	constructor() {
