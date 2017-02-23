@@ -138,34 +138,49 @@ export function items( state = {}, action ) {
 
 			// A site settings update may or may not include the icon property.
 			// If not, we should simply return state unchanged.
-			if ( ! settings.hasOwnProperty( 'site_icon' ) ) {
+			if ( ! settings.hasOwnProperty( 'site_icon' ) && ! settings.hasOwnProperty( 'blog_public' ) ) {
 				return state;
 			}
 
-			const mediaId = settings.site_icon;
-
-			// Similarly, return unchanged if next icon matches current value,
-			// accounting for the fact that a non-existent icon property is
-			// equivalent to setting the media icon as null
 			const site = state[ siteId ];
-			if ( ! site || ( ! site.icon && null === mediaId ) ||
-					( site.icon && site.icon.media_id === mediaId ) ) {
+			let nextSite;
+
+			if ( ! site ) {
 				return state;
 			}
 
-			let nextSite;
-			if ( null === mediaId ) {
-				// Unset icon
-				nextSite = omit( site, 'icon' );
-			} else {
-				// Update icon, intentionally removing reference to the URL,
-				// shifting burden of URL lookup to selector
+			if ( settings.hasOwnProperty( 'blog_public' ) ) {
+				// Site settings returns a numerical value for blog_public.
+				// Site state expects a true/false value for is_private.
+				const sitePrivacy = parseInt( settings.blog_public, 10 ) !== 1;
+
 				nextSite = {
 					...site,
-					icon: {
-						media_id: mediaId
-					}
+					is_private: sitePrivacy
 				};
+			} else if ( settings.hasOwnProperty( 'site_icon' ) ) {
+				const mediaId = settings.site_icon;
+				// Similarly, return unchanged if next icon matches current value,
+				// accounting for the fact that a non-existent icon property is
+				// equivalent to setting the media icon as null
+				if ( ( ! site.icon && null === mediaId ) ||
+						( site.icon && site.icon.media_id === mediaId ) ) {
+					return state;
+				}
+
+				if ( null === mediaId ) {
+					// Unset icon
+					nextSite = omit( site, 'icon' );
+				} else {
+					// Update icon, intentionally removing reference to the URL,
+					// shifting burden of URL lookup to selector
+					nextSite = {
+						...site,
+						icon: {
+							media_id: mediaId
+						}
+					};
+				}
 			}
 
 			return {

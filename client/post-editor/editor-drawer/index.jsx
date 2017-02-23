@@ -28,6 +28,7 @@ import { getEditedPostValue } from 'state/posts/selectors';
 import { getPostType } from 'state/post-types/selectors';
 import { isJetpackMinimumVersion } from 'state/sites/selectors';
 import config from 'config';
+import { isPrivateSite } from 'state/selectors';
 
 import EditorDrawerTaxonomies from './taxonomies';
 import EditorDrawerPageOptions from './page-options';
@@ -246,7 +247,9 @@ const EditorDrawer = React.createClass( {
 
 		const { plan } = this.props.site;
 		const hasBusinessPlan = isBusiness( plan ) || isEnterprise( plan );
-		if ( ! hasBusinessPlan ) {
+		const { isSitePrivate } = this.props;
+
+		if ( ! hasBusinessPlan || isSitePrivate ) {
 			return;
 		}
 
@@ -328,7 +331,8 @@ export default connect(
 		return {
 			canJetpackUseTaxonomies: isJetpackMinimumVersion( state, siteId, '4.1' ),
 			jetpackVersionSupportsSeo: isJetpackMinimumVersion( state, siteId, '4.4-beta1' ),
-			typeObject: getPostType( state, siteId, type )
+			typeObject: getPostType( state, siteId, type ),
+			isSitePrivate: isPrivateSite( state, siteId ),
 		};
 	},
 	null,
