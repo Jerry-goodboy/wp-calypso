@@ -247,9 +247,9 @@ const EditorDrawer = React.createClass( {
 
 		const { plan } = this.props.site;
 		const hasBusinessPlan = isBusiness( plan ) || isEnterprise( plan );
-		const { isSitePrivate } = this.props;
+		const { isPrivate } = this.props;
 
-		if ( ! hasBusinessPlan || isSitePrivate ) {
+		if ( ! hasBusinessPlan || isPrivate ) {
 			return;
 		}
 
@@ -332,7 +332,7 @@ export default connect(
 			canJetpackUseTaxonomies: isJetpackMinimumVersion( state, siteId, '4.1' ),
 			jetpackVersionSupportsSeo: isJetpackMinimumVersion( state, siteId, '4.4-beta1' ),
 			typeObject: getPostType( state, siteId, type ),
-			isSitePrivate: isPrivateSite( state, siteId ),
+			isPrivate: isPrivateSite( state, siteId ),
 		};
 	},
 	null,
