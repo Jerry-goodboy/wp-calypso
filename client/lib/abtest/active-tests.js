@@ -73,4 +73,13 @@ module.exports = {
 		defaultVariation: 'showMonthly',
 		allowExistingUsers: true
 	},
+	signupDomainsHeadline: {
+		datestamp: '20000313',
+		variations: {
+			original: 50,
+			updated: 50
+		},
+		defaultVariation: 'original',
+		allowExistingUsers: true
+	},
 };
