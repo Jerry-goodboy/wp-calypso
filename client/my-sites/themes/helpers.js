@@ -16,10 +16,6 @@ import config from 'config';
 import { sectionify } from 'lib/route/path';
 import { oldShowcaseUrl } from 'state/themes/utils';
 
-export function getPreviewUrl( theme ) {
-	return `${ theme.demo_uri }?demo=true&iframe=true&theme_preview=true`;
-}
-
 export function getDetailsUrl( theme, site ) {
 	if ( site && site.jetpack ) {
 		return site.options.admin_url + 'themes.php?theme=' + theme.id;
