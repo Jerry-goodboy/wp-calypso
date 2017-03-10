@@ -47,6 +47,7 @@ import {
 	THEME_DELETE_FAILURE,
 	THEME_DELETE_SUCCESS,
 	THEME_TRY_AND_CUSTOMIZE_FAILURE,
+	THEME_ACTIVATE_REQUEST_FAILURE,
 } from 'state/action-types';
 
 import { dispatchSuccess, dispatchError } from './utils';
@@ -230,6 +231,7 @@ export const handlers = {
 	[ THEME_DELETE_FAILURE ]: onThemeDeleteFailure,
 	[ THEME_DELETE_SUCCESS ]: onThemeDeleteSuccess,
 	[ THEME_TRY_AND_CUSTOMIZE_FAILURE ]: dispatchError( translate( 'Customize error, please retry or contact support' ) ),
+	[ THEME_ACTIVATE_REQUEST_FAILURE ]: dispatchError( translate( 'Theme not yet available for this site' ) ),
 };
 
 /**
