@@ -19,7 +19,7 @@ import paths from 'my-sites/upgrades/paths';
 import Notice from 'components/notice';
 import { currentUserHasFlag } from 'state/current-user/selectors';
 import { isSiteUpgradeable } from 'state/sites/selectors';
-import { getSelectedSite, getSelectedSiteId } from 'state/ui/selectors';
+import { getSelectedSite, getSelectedSiteId, getSelectedSiteSlug } from 'state/ui/selectors';
 import QueryProductsList from 'components/data/query-products-list';
 
 const wpcom = wp.undocumented();
@@ -31,6 +31,7 @@ class MapDomain extends Component {
 		path: React.PropTypes.string.isRequired,
 		cart: React.PropTypes.object.isRequired,
 		selectedSite: React.PropTypes.object,
+		getSelectedSiteSlug: React.PropTypes.string,
 		domainsWithPlansOnly: React.PropTypes.bool.isRequired,
 		isSiteUpgradeable: React.PropTypes.bool,
 		productsList: React.PropTypes.object.isRequired,
@@ -65,6 +66,7 @@ class MapDomain extends Component {
 		const {
 			path,
 			selectedSite,
+			selectedSiteSlug,
 		} = this.props;
 
 		if ( ! selectedSite ) {
@@ -73,15 +75,15 @@ class MapDomain extends Component {
 		}
 
 		if ( selectedSite.is_vip ) {
-			page( paths.domainManagementList( selectedSite.slug ) );
+			page( paths.domainManagementList( selectedSiteSlug ) );
 			return;
 		}
 
-		page( '/domains/add/' + selectedSite.slug );
+		page( '/domains/add/' + selectedSiteSlug );
 	}
 
 	handleRegisterDomain( suggestion ) {
-		const { selectedSite } = this.props;
+		const { selectedSiteSlug } = this.props;
 
 		upgradesActions.addItem(
 			cartItems.domainRegistration( {
@@ -90,11 +92,11 @@ class MapDomain extends Component {
 			} )
 		);
 
-		page( '/checkout/' + selectedSite.slug );
+		page( '/checkout/' + selectedSiteSlug );
 	}
 
 	handleMapDomain( domain ) {
-		const { selectedSite } = this.props;
+		const { selectedSite, selectedSiteSlug } = this.props;
 
 		this.setState( { errorMessage: null } );
 
@@ -104,7 +106,7 @@ class MapDomain extends Component {
 		if ( selectedSite.is_vip ) {
 			wpcom.addVipDomainMapping( selectedSite.ID, domain )
 				.then(
-					() => page( paths.domainManagementList( selectedSite.slug ) ),
+					() => page( paths.domainManagementList( selectedSiteSlug ) ),
 					( error ) => this.setState( { errorMessage: error.message } )
 				);
 			return;
@@ -112,7 +114,7 @@ class MapDomain extends Component {
 
 		upgradesActions.addItem( cartItems.domainMapping( { domain } ) );
 
-		page( '/checkout/' + selectedSite.slug );
+		page( '/checkout/' + selectedSiteSlug );
 	}
 
 	render() {
@@ -157,6 +159,7 @@ class MapDomain extends Component {
 export default connect(
 	( state ) => ( {
 		selectedSite: getSelectedSite( state ),
+		selectedSiteSlug: getSelectedSiteSlug( state ),
 		domainsWithPlansOnly: currentUserHasFlag( state, DOMAINS_WITH_PLANS_ONLY ),
 		isSiteUpgradeable: isSiteUpgradeable( state, getSelectedSiteId( state ) ),
 		productsList: state.productsList.items,

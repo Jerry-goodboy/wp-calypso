@@ -13,13 +13,14 @@ import HeaderCake from 'components/header-cake';
 import Main from 'components/main';
 import SiteRedirectStep from './site-redirect-step';
 import { isSiteUpgradeable } from 'state/sites/selectors';
-import { getSelectedSite, getSelectedSiteId } from 'state/ui/selectors';
+import { getSelectedSite, getSelectedSiteId, getSelectedSiteSlug } from 'state/ui/selectors';
 import QueryProductsList from 'components/data/query-products-list';
 
 class SiteRedirect extends Component {
 	static propTypes = {
 		cart: React.PropTypes.object.isRequired,
 		selectedSite: React.PropTypes.object,
+		selectedSiteSlug: React.PropTypes.string,
 		isSiteUpgradeable: React.PropTypes.bool,
 		productsList: React.PropTypes.object.isRequired,
 		translate: React.PropTypes.func.isRequired,
@@ -45,7 +46,7 @@ class SiteRedirect extends Component {
 	}
 
 	handleBackToDomainSearch() {
-		page( '/domains/add/' + this.props.selectedSite.slug );
+		page( '/domains/add/' + this.props.selectedSiteSlug );
 	}
 
 	render() {
@@ -76,6 +77,7 @@ class SiteRedirect extends Component {
 export default connect(
 	( state ) => ( {
 		selectedSite: getSelectedSite( state ),
+		selectedSiteSlug: getSelectedSiteSlug( state ),
 		isSiteUpgradeable: isSiteUpgradeable( state, getSelectedSiteId( state ) ),
 		productsList: state.productsList.items,
 	} )
