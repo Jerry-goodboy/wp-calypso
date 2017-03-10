@@ -717,6 +717,25 @@ describe( 'selectors', () => {
 			expect( isUpgradeable ).to.be.null;
 		} );
 
+		it( 'should return null if there is no site with that siteId', () => {
+			const isUpgradeable = isSiteUpgradeable( {
+				sites: {
+					items: {
+						77203199: {
+							ID: 77203199,
+							URL: 'https://example.com',
+							options: {
+								unmapped_url: 'https://example.wordpress.com'
+							}
+						}
+					}
+				},
+				currentUser: {}
+			}, 42 );
+
+			expect( isUpgradeable ).to.be.null;
+		} );
+
 		it( 'should return null if there is no current user', () => {
 			const isUpgradeable = isSiteUpgradeable( {
 				sites: {
